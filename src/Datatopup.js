@@ -42,12 +42,12 @@ const NetworkDropdown = ({navigation}) => {
             onPress={() => setIsDropdownVisible(false)}
             style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}
           />
-          <View style={{ backgroundColor: '#fff', padding: 20 }}>
+          <View style={{ backgroundColor: '#fff', padding: 20 ,borderRadius:25}}>
             <FlatList
               data={networkOptions}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => selectNetwork(item)} style={{ padding: 10 }}>
+                <TouchableOpacity onPress={() => selectNetwork(item)} style={{ padding: 10, borderRadius:25 }}>
                   <Text>{item}</Text>
                 </TouchableOpacity>
               )}
@@ -70,7 +70,7 @@ const NetworkDropdown = ({navigation}) => {
             onPress={() => setDataVisible(false)}
             style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}
           />
-          <View style={{ backgroundColor: '#fff', padding: 20 }}>
+          <View style={{ backgroundColor: '#fff', padding: 20,}}>
             <FlatList
               data={dataplanOptions}
               keyExtractor={(item) => item}
@@ -92,6 +92,7 @@ const NetworkDropdown = ({navigation}) => {
     </View>
 
       {/* <Text>Selected Network: {selectedNetwork}</Text> */}
+      {/* style={ [styles.input, { borderRadius:25 , height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, padding: 10 }]} */}
     </View>
 
 

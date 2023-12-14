@@ -1,10 +1,77 @@
-import React from 'react'
-import { StyleSheet, Text, View,Dimensions,SafeAreaView } from 'react-native'
+import React, { useState } from 'react'
+import { StyleSheet, Text, View,Dimensions,SafeAreaView, Pressable, Modal, Alert } from 'react-native'
 import { AntDesign } from '@expo/vector-icons'; 
 import { Entypo } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import {FlutterwaveButton, FlutterwaveInit, PayWithFlutterwave} from 'flutterwave-react-native';
+
 
 const Dashboard = ({ navigation }) => {
+  const [isShowing, setShowing] = useState(false);
+  const [amount, setAmount] = useState(2000);
+
+  const formatAmout = ( amount )=>{
+          return amount.toLocaleString('en-US');
+  }
+
+  const handleOnRedirect = (ref) => {
+    console.log(ref);
+    if(ref.status === 'successful'){
+            
+      fetch("http://192.168.43.247/prime_top_api/fundwallet/", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: 2,  
+          amount: amount,
+        }),
+      })
+        .then((response) => response.json())
+        .then((responseData) => {
+          console.log(JSON.stringify(responseData));
+        });
+
+
+
+    }else{
+      Alert.alert(
+        'Failed',
+        'Account Funding Failed',
+        
+      )
+    }
+
+ }
+
+ const generateRef = (length) => {
+  var a = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".split("");
+  var b = [];  
+  for (var i=0; i<length; i++) {
+      var j = (Math.random() * (a.length-1)).toFixed(0);
+      b[i] = a[j];
+  }
+  return b.join("");
+}
+
+  const FundAccount =  ()=>(
+    <PayWithFlutterwave
+        onRedirect={handleOnRedirect}
+        options={{
+            tx_ref: generateRef(11),
+            authorization: 'FLWPUBK_TEST-b1bba9b145e63ccfe85822d712b3f359-X',
+            customer: {
+                email: 'user@gmail.com'
+            },
+            amount: amount,
+            currency: 'NGN',
+            payment_options: 'card,ussd'
+          }}
+   />
+  )
   const [width, height] = [Dimensions.get('window').width, Dimensions.get('window').height];
   return (
     <SafeAreaView style={{flex:1, height:height,  width:width, backgroundColor:'#fff',}}>
@@ -27,9 +94,22 @@ const Dashboard = ({ navigation }) => {
 
               </View>
 
-              <View style={[styles.balance,{marginTop:80}]}>
-              <Text style={[{ color:'white', fontSize:20}]}> Your Wallet Balance = $50000</Text>
-              </View>
+              <View style={[styles.balance,{marginTop:1, height:80, flexDirection:'row', justifyContent:'space-between',alignItems:'center'}]}>
+                   <View>
+                        <Text style={[{ color:'white', fontSize:14,fontWeight:'bold'}]}>Wallet Balance </Text>
+                        <Text style={[{ color:'white', fontSize:18}]}>&#x20A6;{formatAmout(50000)}</Text>
+                   </View>
+                    
+                    <Pressable> 
+                           <FundAccount />
+                    </Pressable>
+              </View> 
+
+              <Modal visible ={isShowing}>
+
+              </Modal>
+             
+
 
               {/* top up container starts here */}
 

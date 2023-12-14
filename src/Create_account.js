@@ -1,32 +1,69 @@
 // Import necessary components from React and React Native
  // Dashborad
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
 // Create a functional component for the sign-up page
 const SignUpScreen = ({ navigation } ) => {
   // State variables to store user input
-  const [surname, setSurname] = useState('');
-  const [othernames, setOthernames] = useState('');
-  const [email, setEmail] = useState('');
+  const [Fullname, setFullname] = useState('');
+  const [Username, setUsername] = useState('');
+  const [email, setEmail]       = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
+  const [password, setPassword]       = useState('');
+
 
   // Function to handle sign-up button press
   const handleSignUp = () => {
     // Perform sign-up logic here (e.g., send data to a server)
-    // For simplicity, we will just log the user input for now
-    console.log({
-      surname,
-      othernames,
-      email,
-      phoneNumber,
-      password,
-    });
+    if(!Fullname || !Username || !email || !phoneNumber || !password) {
+        Alert.alert(
+           "Error",
+           "All fields are required",
+           [
+             { 
+              text: "Okay",
+              onPress:()=>{
+                   console.log("Okay")
+              }
+            }
+           ]
+        );
+    }else{
+      fetch("http://192.168.43.247/prime_top_api/create-account/", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullname: Fullname,
+          username: Username,
+          email: email,
+          phoneNumber:phoneNumber,
+          password:password,
+        }),
+      })
+        .then((response) => response.json())
+        .then((responseData) => {
+          console.log( responseData ); 
+          console.log( typeof responseData ); 
+          
+          // check response is success
+          if ( responseData.message === 'success' )  {
+               navigation.navigate('Login');
+          }else{
+              console.log( " OOPs !!! ");
+          }
+        })
+        .catch( error => console.log(error) );
+
+
+    }
 
     // Reset the input fields after sign-up
-    setSurname('');
-    setOthernames('');
+    setFullname('');
+    setUsername('');
     setEmail('');
     setPhoneNumber('');
     setPassword('');
@@ -35,27 +72,27 @@ const SignUpScreen = ({ navigation } ) => {
   return (
     <View style={styles.container}>
       {/* Display input fields for user information */}
-      <Text>Surname:</Text>
+      <Text>Fullname:</Text>
       <TextInput
         style={[styles.input,{color:'black', borderRadius:25}]}
-        value={surname}
-        onChangeText={setSurname}
-        placeholder="Enter your surname"
+        value={Fullname}
+        onChangeText={ ( val )=> setFullname(val)}
+        placeholder="Enter your fullname"
       />
 
-      <Text>Othernames:</Text>
+      <Text>Username:</Text>
       <TextInput
         style={[styles.input,{color:'black', borderRadius:25}]}
-        value={othernames}
-        onChangeText={setOthernames}
-        placeholder="Enter your other names"
+        value={Username}
+        onChangeText={ ( user ) => setUsername(user) }
+        placeholder="Enter your username"
       />
 
       <Text>Email:</Text>
       <TextInput
         style={[styles.input,{color:'black', borderRadius:25}]}
         value={email}
-        onChangeText={setEmail}
+        onChangeText={ ( email ) => setEmail( email ) }
         placeholder="Enter your email"
         keyboardType="email-address"
       />
@@ -64,7 +101,7 @@ const SignUpScreen = ({ navigation } ) => {
       <TextInput
         style={[styles.input,{color:'black', borderRadius:25}]}
         value={phoneNumber}
-        onChangeText={setPhoneNumber}
+        onChangeText={ ( phone ) => setPhoneNumber( phone ) }
         placeholder="Enter your phone number"
         keyboardType="phone-pad"
       />
@@ -73,7 +110,7 @@ const SignUpScreen = ({ navigation } ) => {
       <TextInput
         style={[styles.input,{color:'black', borderRadius:25}]}
         value={password}
-        onChangeText={setPassword}
+        onChangeText={( pass ) => setPassword(pass) }
         placeholder="Enter your password"
         secureTextEntry
       />
@@ -82,7 +119,7 @@ const SignUpScreen = ({ navigation } ) => {
       {/* <Button title="Sign Up" onPress={handleSignUp} /> */}
 
       <View style={[styles.Create_account, {borderRadius:25}]}> 
-         <TouchableOpacity>
+         <TouchableOpacity onPress={handleSignUp}>
           <Text style={[{fontSize:20, color:'white'}]}>Create Account</Text>
          </TouchableOpacity>
       </View>

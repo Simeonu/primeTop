@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View,TextInput,TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View,TextInput, Pressable } from 'react-native'
 // import React from 'react'
 import React, { useState } from 'react';
 
@@ -24,7 +24,7 @@ const handleTopup = () => {
     <TextInput
       placeholder="Enter Receipient's phone number"
       keyboardType="numeric"
-      style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, padding: 10 }}
+      style={ [styles.input, { borderRadius:25 , height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, padding: 10 }]}
       value={amount}
       onChangeText={(text) => setAmount(text)}
     />
@@ -32,8 +32,8 @@ const handleTopup = () => {
     <TextInput
       placeholder="Enter amount"
       keyboardType="numeric"
-      style={{ height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, padding: 10 }}
-      value={network}
+      style={ [styles.input, { borderRadius:25 , height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, padding: 10 }]}
+       value={network}
       onChangeText={(text) => setNetwork(text)}
     />
     {/* <TextInput
@@ -42,13 +42,14 @@ const handleTopup = () => {
       value={network}
       onChangeText={(text) => setNetwork(text)}
     /> */}
-       <View style={[styles.login, {borderRadius:25}]}> 
-       <TouchableOpacity
-       onPress={()=>{ navigation.navigate('Landing') }}
-       >
-        <Text style={[{fontSize:20, color:'white'}]}>Send Now</Text>
-       </TouchableOpacity>
-    </View>
+
+    <Pressable
+        style={[styles.login, {borderRadius:25}]}
+        onPress={()=>{ navigation.navigate('Landing') }}
+    >
+            <Text style={[{fontSize:20, color:'white'}]}>Send Now</Text>
+      
+    </Pressable>
   </View>
   )
 }

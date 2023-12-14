@@ -3,14 +3,63 @@ import React, { useState } from 'react';
 import { View, TextInput,StyleSheet,Text } from 'react-native';
 import Styles from './styles';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import ForgotPasswordScreen from './Forgot_password';
+// import ForgotPasswordScreen from './Forgot_password';
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    navigation.navigate('Home');
+    // 1. make network call to the endpoint
+    // 2. check  if the message rrturns successs
+    // 3. store the user record to the AsyncStorrage 
+    // 4. store the user data in state 
+    // 5. redirect the user to the dashboard screen 
+    if(!username || !password) {
+      Alert.alert(
+         "Error",
+         "All fields are required",
+         [
+           { 
+            text: "Okay",
+            onPress:()=>{
+                 console.log("Okay")
+            }
+          }
+         ]
+      );
+  }else{
+    fetch("http://192.168.43.247/prime_top_api/login/", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ 
+        username, 
+        password,
+      }),
+    })
+      .then((response) => response.json())
+      .then((responseData) => {
+        console.log( responseData );          
+        // check response is success
+        if ( responseData.message === 'success' )  {
+             navigation.navigate('Dashboard');
+        }else{
+            console.log( " OOPs !!! ");
+        }
+      })
+      .catch( error => console.log(error) );
+
+
+  }
+
+  // Reset the input fields after sign-up
+  setUsername(''); 
+  setPassword('');
+
+
   };
 
   return (
@@ -36,7 +85,7 @@ const LoginScreen = ({ navigation }) => {
          {/* <Button title="Login" onPress={handleLogin}  /> */}
       <View style={[styles.login, {borderRadius:25}]}> 
          <TouchableOpacity
-         onPress={()=>{ navigation.navigate('Landing') }}
+         onPress={ handleLogin }
          >
           <Text style={[{fontSize:20, color:'white'}]}>Login</Text>
          </TouchableOpacity>
