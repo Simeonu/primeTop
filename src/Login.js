@@ -1,13 +1,16 @@
 // LoginScreen.js
 import React, { useState } from 'react';
-import { View, TextInput,StyleSheet,Text } from 'react-native';
+import { View, TextInput,StyleSheet,Text, Alert } from 'react-native';
 import Styles from './styles';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-// import ForgotPasswordScreen from './Forgot_password';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../slicers/AuthSlice';
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  const dispatch = useDispatch()
 
   const handleLogin = () => {
     // 1. make network call to the endpoint
@@ -45,6 +48,7 @@ const LoginScreen = ({ navigation }) => {
         console.log( responseData );          
         // check response is success
         if ( responseData.message === 'success' )  {
+             dispatch( login(responseData.userRecord))
              navigation.navigate('Dashboard');
         }else{
             console.log( " OOPs !!! ");

@@ -18,23 +18,30 @@ import Airtimeothers from './src/Airtimeothers';
 import Datatopup from './src/Datatopup';
 
 
+import { Provider } from 'react-redux';
+import { store } from './Store';
+
+
 export default function App() {
   return (
-      <NavigationContainer>
-          <Stack.Navigator initialRouteName='Home'>
-                 <Stack.Screen name='Home'   component={HomeScreen} options={{ headerShown:false}}/>
-                 <Stack.Screen name='Create_account' component={Create_account} />
-                 <Stack.Screen name='Login'  component={Login}  options={{ headerShown:true}} />
-                 <Stack.Screen name='ForgotPasswordScreen'  component={ForgotPasswordScreen}  options={{ headerShown:false}} />
-                 <Stack.Screen name='Dashboard'  component={Dashboard}  options={{ headerShown:false}} />
-                 <Stack.Screen name='Landing'  component={Landing}  options={{ headerShown:false}} />
-                 <Stack.Screen name='User'  component={User}  options={{ headerShown:true}} />
-                 <Stack.Screen name='History'  component={History}  options={{ headerShown:true}} />
-                 <Stack.Screen name='Airtimeself'  component={Airtimeself}  options={{ headerShown:true}} />
-                 <Stack.Screen name='Airtimeothers'  component={Airtimeothers}  options={{ headerShown:true}} />
-                 <Stack.Screen name='Datatopup'  component={Datatopup}  options={{ headerShown:true}} />
-          </Stack.Navigator>
-      </NavigationContainer>
+    <Provider store={store}>
+            <NavigationContainer>
+              <Stack.Navigator initialRouteName='Home'>
+                    <Stack.Screen name='Home'   component={HomeScreen} options={{ headerShown:false}}/>
+                    <Stack.Screen name='Create_account' component={Create_account} />
+                    <Stack.Screen name='Login'  component={Login}  options={{ headerShown:true}} />
+                    <Stack.Screen name='ForgotPasswordScreen'  component={ForgotPasswordScreen}  options={{ headerShown:false}} />
+                    <Stack.Screen name='Dashboard'  component={Dashboard}  options={{ headerShown:false}} />
+                    <Stack.Screen name='Landing'  component={Landing}  options={{ headerShown:false}} />
+                    <Stack.Screen name='User'  component={User}  options={{ headerShown:true}} />
+                    <Stack.Screen name='History'  component={History}  options={{ headerShown:true}} />
+                    <Stack.Screen name='Airtimeself'  component={Airtimeself}  options={{ headerShown:true}} />
+                    <Stack.Screen name='Airtimeothers'  component={Airtimeothers}  options={{ headerShown:true}} />
+                    <Stack.Screen name='Datatopup'  component={Datatopup}  options={{ headerShown:true}} />
+              </Stack.Navigator>
+          </NavigationContainer>
+    </Provider>
+
   );
 }
 

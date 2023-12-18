@@ -1,39 +1,104 @@
-import React, { useState } from 'react'
-import { StyleSheet, Text, View,Dimensions,SafeAreaView, Pressable, Modal, Alert } from 'react-native'
+import React, { useEffect, useState, useRef} from 'react'
+import { StyleSheet, Text, View,Dimensions,SafeAreaView, Pressable, Modal, Alert, TextInput } from 'react-native'
 import { AntDesign } from '@expo/vector-icons'; 
 import { Entypo } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {FlutterwaveButton, FlutterwaveInit, PayWithFlutterwave} from 'flutterwave-react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { debitWallet, getBalance, fundWallet} from '../slicers/FundWalletSlice';
+import Endpoints from '../Endpoints';
 
 
 const Dashboard = ({ navigation }) => {
   const [isShowing, setShowing] = useState(false);
-  const [amount, setAmount] = useState(2000);
+  const [amount, setAmount]     = useState(0);
+  const modalRef = useRef(null);
+
+  const user   = useSelector((state) => state.auth.user);
+  const wallet = useSelector((state) => state.fund.bal);
+  console.log(user.userId);
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    fetch(`${Endpoints.baseUrl}/${Endpoints.wallet.bal}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id: user.userId
+      }),
+    })
+    .then((response) => response.json())
+    .then((res) => {
+      console.log(res);
+       dispatch( fundWallet( res.cuurentBal ))
+    }).catch(( error )=>{
+         console.error(error);
+    });
+  }, []);
+
+
 
   const formatAmout = ( amount )=>{
           return amount.toLocaleString('en-US');
   }
 
+const handleTxRecord = ( responseObject ) => { 
+       const dataToSend = {
+              status:responseObject.status,
+              tx_ref:responseObject.tx_ref,
+              amount: amount,
+              user_id: user.userId,
+              tx_type:'funding'
+            };
+            
+    console.log("Date to send : ", dataToSend );
+
+      fetch(`${Endpoints.baseUrl}/${Endpoints.tx.create}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSend),
+      })
+      .then((response) => response.json())
+      .then((res) => {
+        console.log(res);
+      }).catch(( error )=>{
+           console.log(error);
+      });
+ 
+ }
+
   const handleOnRedirect = (ref) => {
     console.log(ref);
     if(ref.status === 'successful'){
             
-      fetch("http://192.168.43.247/prime_top_api/fundwallet/", {
+      fetch(`${Endpoints.baseUrl}/${Endpoints.wallet.fund}`, {
         method: "POST",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          user_id: 2,  
+          user_id: user.userId,  
           amount: amount,
         }),
       })
         .then((response) => response.json())
-        .then((responseData) => {
-          console.log(JSON.stringify(responseData));
-        });
+        .then((fundinResponse) => {
+           console.log(fundinResponse)
+          if (fundinResponse.message == 'success') {
+            handleTxRecord(ref); 
+            dispatch( fundWallet( amount ));
+          }
+        }).catch( ( error ) =>  {
+              console.warn(error)
+        } );
 
 
 
@@ -64,7 +129,7 @@ const Dashboard = ({ navigation }) => {
             tx_ref: generateRef(11),
             authorization: 'FLWPUBK_TEST-b1bba9b145e63ccfe85822d712b3f359-X',
             customer: {
-                email: 'user@gmail.com'
+                email: user.email
             },
             amount: amount,
             currency: 'NGN',
@@ -97,15 +162,66 @@ const Dashboard = ({ navigation }) => {
               <View style={[styles.balance,{marginTop:1, height:80, flexDirection:'row', justifyContent:'space-between',alignItems:'center'}]}>
                    <View>
                         <Text style={[{ color:'white', fontSize:14,fontWeight:'bold'}]}>Wallet Balance </Text>
-                        <Text style={[{ color:'white', fontSize:18}]}>&#x20A6;{formatAmout(50000)}</Text>
+                        <Text style={[{ color:'white', fontSize:18}]}>&#x20A6;{formatAmout(wallet)}</Text>
                    </View>
                     
-                    <Pressable> 
-                           <FundAccount />
+                  <Pressable onPress={ ()=> {
+                    setShowing(!isShowing) ;
+                    modalRef.current(amount);
+                    }}> 
+                         <MaterialCommunityIcons name="credit-card-refund" size={34} color="white" />
+                           {/* <FundAccount /> */}
                     </Pressable>
               </View> 
 
-              <Modal visible ={isShowing}>
+              <Modal 
+                 visible ={isShowing}
+                 animationType="slide"
+                 transparent={false} 
+                 onRequestClose={() => {
+                   Alert.alert('Modal has been closed.');
+                   setShowing(!isShowing);
+                 }}
+                 
+                 style={{
+                    height: '50%',
+                    width: 100,
+                    flex:1,
+                    flexDirection: 'column',
+                    backgroundColor:'#ccc', 
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    
+                 }}
+              >
+                <View 
+                   style={{
+                    height: '50%',
+                    width: '100%',
+                    flexDirection: 'column', 
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flex:1
+                 }}
+                >
+                  <Text style={{ fontWeight:'bold', fontSize:20}}>Funding Wallet</Text>
+                  <TextInput 
+                      placeholder="Amount to fund"
+                      keyboardType = 'numeric'
+                      onChanged={(amt) => setAmount(amt)}
+                      value={amount.toString()}
+                      style={{
+                         height: 50,
+                         width: 215,
+                         padding: 10,  
+                          borderWidth:1,
+                          borderColor: '#000000',
+                          marginVertical:10
+
+                      }}
+                    />
+                    <FundAccount /> 
+                </View>
 
               </Modal>
              
